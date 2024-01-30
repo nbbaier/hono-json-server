@@ -1,0 +1,16 @@
+{
+    "posts": [
+        {
+            "id": 1,
+            "title": "Magna pars studiorum elit, prodita quaerimus."
+        },
+        {
+            "id": 2,
+            "title": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        }
+    ],
+    "user": {
+        "id": 1,
+        "name": "Leanne Graham"
+    }
+}
