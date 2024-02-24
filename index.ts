@@ -1,55 +1,59 @@
-import { openapi } from "./api.ts";
-console.log(openapi);
+import { Hono } from "hono";
+import { z } from "zod";
 
-// // @ts-ignore
-// import data from "./db.json";
-// import { Hono } from "hono";
+interface Resource {
+  name: string;
+  type: string;
+  label: string;
+}
 
-// type DB = typeof data & { [key: string]: any };
-// const db: DB = data;
-// type Options = { homepage?: string };
+const getResources = (db: Record<string, any>) => {
+  return Object.entries(db.data).map(([name, value]) => {
+    const type = Array.isArray(value) ? "plural" : "singular";
+    const label =
+      type === "singular" ? "object" : `${(value as Array<any>).length}x`;
+    return { name, type, label };
+  });
+};
 
-// function createJsonServer(db: DB, options: Options = {}) {
-//   const app = new Hono();
+const validate = (db: Record<string, any>) => {
+  if (!("data" in db)) {
+    return false;
+  }
+  return z.object({}).safeParse(db.data).success;
+};
 
-//   app.get("/", (c) => c.text("Hello, world!"));
-//   app.get("/db", (c) => c.json(db));
-//   app.post("/db", async (_, next) => {
-//     console.log("middleware 1 start");
-//     await next();
-//     console.log("middleware 1 end");
-//   });
-//   app.post("/db", (c) => c.json(db));
-//   return app;
-// }
+const checkResource = (resource: string, resources: Resource[]) => {
+  return resources.some((r) => r.name === resource);
+};
 
-// const app = createJsonServer(db, { homepage: "https://github.com" });
+export async function createServer(db: Record<string, any>) {
+  const app = new Hono();
 
-// // app.get("/:name", (c) => {
-// //   const name = c.req.param().name as string;
-// //   const queries = c.req.queries();
-// //   let data = db[name];
-// //   return c.json(data);
-// // });
-// // app.get("/:name/:id", (c) => {
-// //   const { name, id } = c.req.param();
-// //   const output = db[name].find(
-// //     (item: { id: number }) => item.id === parseInt(id)
-// //   );
-// //   return c.json(output);
-// // });
+  // Make sure our db contains "data"
+  if (!validate(db)) {
+    app.get("/", (c) => c.text("Wrong data shape"));
+    return app;
+  }
 
-// const server = Bun.serve({
-//   // port: 3000,
-//   fetch: app.fetch,
-// });
+  // Extract information about the resources in the db
+  const resources = getResources(db);
 
-// console.log(`Listening on http://localhost:${server.port}`);
+  // Get / => returns home
+  app.get("/", (c) => c.text("homepage"));
 
-// //   if (queries && queries.q) {
-// //   const output = db[name].filter(
-// //     (item: { id: number } & { [key: string]: any }) =>
-// //       item.title.includes(queries.q[0] as string)
-// //   );
-// //   return c.json(output);
-// // }
+  // GET /db => returns all db data
+  app.get("/db", (c) => c.json(db.data));
+
+  // GET /:resource => if :resource is valid, returns db.data[resource]
+  app.get("/:resource", (c) => {
+    const { resource } = c.req.param();
+
+    if (!checkResource(resource, resources)) {
+      return c.text(`The requested resource (${resource}) is not available`);
+    }
+
+    return c.json(db.data[resource]);
+  });
+  return app;
+}

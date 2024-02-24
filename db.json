@@ -1,18 +1,20 @@
 {
-    "posts": [
-        {
+    "data": {
+        "posts": [
+            {
+                "id": 1,
+                "title": "Magna pars studiorum elit, prodita quaerimus.",
+                "user_id": 1
+            },
+            {
+                "id": 2,
+                "title": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "user_id": 1
+            }
+        ],
+        "user": {
             "id": 1,
-            "title": "Magna pars studiorum elit, prodita quaerimus."
-                        "user_id": 1
-        },
-        {
-            "id": 2,
-            "title": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-            "user_id": 1
+            "name": "Leanne Graham"
         }
-    ],
-    "user": {
-        "id": 1,
-        "name": "Leanne Graham"
     }
 }
