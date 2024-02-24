@@ -1,4 +1,4 @@
-# honojsonserver
+# hono-json-server
 
 To install dependencies:
 
