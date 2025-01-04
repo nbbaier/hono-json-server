@@ -9,14 +9,14 @@ import { jwt } from "hono/jwt";
 const app = new Hono();
 
 app.use(
-  "/auth/*",
-  jwt({
-    secret: "it-is-very-secret",
-  })
+	"/auth/*",
+	jwt({
+		secret: "it-is-very-secret",
+	}),
 );
 
 app.get("/auth/page", (c) => {
-  return c.text("You are authorized");
+	return c.text("You are authorized");
 });
 
 // app.get(
@@ -53,7 +53,7 @@ app.get("/auth/page", (c) => {
 // app.get("/", (c) => c.text("hi"));
 
 Bun.serve({
-  fetch: app.fetch,
+	fetch: app.fetch,
 });
 
 console.log(showRoutes(app));
